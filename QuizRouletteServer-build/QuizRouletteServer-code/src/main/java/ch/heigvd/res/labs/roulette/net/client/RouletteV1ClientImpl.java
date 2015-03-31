@@ -78,7 +78,16 @@ public class RouletteV1ClientImpl implements IRouletteV1Client {
 
 	@Override
 	public int getNumberOfStudents() throws IOException {
-		return 0;
+		String reply;
+		InfoCommandResponse infoReply;
+
+		writer.println(RouletteV1Protocol.CMD_INFO);
+		reply = reader.readLine();
+		if (reply.split(" ", 1)[0].equals("Hello")) {
+			reply = reader.readLine();
+		}
+		infoReply = JsonObjectMapper.parseJson(reply, InfoCommandResponse.class);
+		return infoReply.getNumberOfStudents();
 	}
 
 	@Override

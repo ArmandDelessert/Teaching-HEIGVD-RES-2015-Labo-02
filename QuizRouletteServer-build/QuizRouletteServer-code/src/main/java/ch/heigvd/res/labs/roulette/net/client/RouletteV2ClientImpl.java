@@ -24,4 +24,9 @@ public class RouletteV2ClientImpl extends RouletteV1ClientImpl implements IRoule
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
+	@Override
+	public String getProtocolVersion() throws IOException {
+		return RouletteV2Protocol.VERSION;
+	}
+
 }
