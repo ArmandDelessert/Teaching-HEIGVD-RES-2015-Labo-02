@@ -44,7 +44,7 @@ public class RouletteV1DelessertTest {
 
 	@Test
 	@TestAuthor(githubId = {"simon-baehler", "ArmandDelessert"})
-	public void YouAreTheOnlyOne() throws IOException, EmptyStoreException {
+	public void youAreTheOnlyOne() throws IOException, EmptyStoreException {
 		IRouletteV1Client client = roulettePair.getClient();
 		client.loadStudent("Simon");
 		Student student = client.pickRandomStudent();
@@ -53,7 +53,7 @@ public class RouletteV1DelessertTest {
 
 	@Test
 	@TestAuthor(githubId = {"simon-baehler", "ArmandDelessert"})
-	public void YouAreNotTheOnlyOne() throws IOException, EmptyStoreException {
+	public void youAreNotTheOnlyOne() throws IOException, EmptyStoreException {
 		IRouletteV1Client client = roulettePair.getClient();
 		client.connect("localhost", roulettePair.getServer().getPort());
 		assertTrue(client.isConnected());
@@ -65,7 +65,7 @@ public class RouletteV1DelessertTest {
 
 	@Test
 	@TestAuthor(githubId = {"simon-baehler", "ArmandDelessert"})
-	public void AddStudentList() throws IOException, EmptyStoreException {
+	public void addStudentList() throws IOException, EmptyStoreException {
 		IRouletteV1Client client = roulettePair.getClient();
 		client.connect("localhost", roulettePair.getServer().getPort());
 		assertTrue(client.isConnected());
@@ -79,7 +79,7 @@ public class RouletteV1DelessertTest {
 
 	@Test
 	@TestAuthor(githubId = {"simon-baehler", "ArmandDelessert"})
-	public void StudentListSameSizeAsgetNumberOfStudents() throws IOException, EmptyStoreException {
+	public void studentListSameSizeAsGetNumberOfStudents() throws IOException, EmptyStoreException {
 		IRouletteV1Client client = roulettePair.getClient();
 		client.connect("localhost", roulettePair.getServer().getPort());
 		assertTrue(client.isConnected());

@@ -45,7 +45,7 @@ public class RouletteV2DelessertTest {
 
 	@Test
 	@TestAuthor(githubId = {"simon-baehler", "ArmandDelessert"})
-	public void AddStudent() throws IOException {
+	public void addStudent() throws IOException {
 		IRouletteV2Client client = new RouletteV2ClientImpl();
 		client.connect("localhost", roulettePair.getServer().getPort());
 		assertTrue(client.isConnected());
@@ -55,7 +55,7 @@ public class RouletteV2DelessertTest {
 
 	@Test
 	@TestAuthor(githubId = {"simon-baehler", "ArmandDelessert"})
-	public void ModifyStudentsName() throws IOException {
+	public void modifyStudentsName() throws IOException {
 		IRouletteV2Client client = new RouletteV2ClientImpl();
 		client.connect("localhost", roulettePair.getServer().getPort());
 		assertTrue(client.isConnected());
@@ -66,7 +66,7 @@ public class RouletteV2DelessertTest {
 
 	@Test
 	@TestAuthor(githubId = {"simon-baehler", "ArmandDelessert"})
-	public void RemovingOnRandomStudent() throws IOException, EmptyStoreException {
+	public void removingOnRandomStudent() throws IOException, EmptyStoreException {
 		IRouletteV2Client client = new RouletteV2ClientImpl();
 		client.connect("localhost", roulettePair.getServer().getPort());
 		assertTrue(client.isConnected());
@@ -78,7 +78,7 @@ public class RouletteV2DelessertTest {
 
 	@Test
 	@TestAuthor(githubId = {"simon-baehler", "ArmandDelessert"})
-	public void GiveMeAFuckingName() throws IOException, EmptyStoreException {
+	public void giveMeAFuckingName() throws IOException, EmptyStoreException {
 		IRouletteV2Client client = new RouletteV2ClientImpl();
 		client.connect("localhost", roulettePair.getServer().getPort());
 		assertTrue(client.isConnected());
