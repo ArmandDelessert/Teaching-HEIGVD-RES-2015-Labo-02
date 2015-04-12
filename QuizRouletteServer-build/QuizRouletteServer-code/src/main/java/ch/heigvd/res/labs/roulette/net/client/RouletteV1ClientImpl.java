@@ -13,86 +13,115 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * This class implements the client side of the protocol specification (version 1).
- * 
+ *
  * @author Olivier Liechti
  */
 public class RouletteV1ClientImpl implements IRouletteV1Client {
 
 	private static final Logger LOG = Logger.getLogger(RouletteV1ClientImpl.class.getName());
+	Socket clientS = null;
+	protected BufferedReader bufferedReader = null;
+	// output to server (dont forget to flush before expecting response!)
+	protected PrintWriter printWriter = null;
 
-	protected Socket socket = null;
-	protected PrintWriter writer;
-	protected BufferedReader reader;
+	private String win = "Hello. Online HELP is available. Will you find it?";
+	private String fail = "Huh? please use HELP if you don't know what commands are available.";
 
+	public String reader() throws IOException {
+		String line;
+		do {
+			line = bufferedReader.readLine();
+		} while (line.equals(win) || line.equals(fail));
+		return line;
+	}
 	@Override
 	public void connect(String server, int port) throws IOException {
-
-		if (isConnected()) {
-			disconnect();
-		}
-
-		socket = new Socket(server, port);
-		reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+		System.out.println("Demande de connexion");
+		clientS = new Socket(server, port);
+		printWriter = new PrintWriter(new OutputStreamWriter(clientS.getOutputStream()));
+		bufferedReader = new BufferedReader(new InputStreamReader(clientS.getInputStream()));
+		System.out.println("Connexion établie avec le serveur");
 	}
 
 	@Override
 	public void disconnect() throws IOException {
-		if (isConnected()) {
-			writer.println(RouletteV1Protocol.CMD_BYE);
-			writer.flush();
-			socket.close();
-			socket = null;
-			writer = null;
-			reader = null;
+		if (clientS != null) {
+			printWriter.println(RouletteV1Protocol.CMD_BYE);
+			clientS.shutdownInput();
+			clientS.shutdownOutput();
+			printWriter.flush();
+			printWriter.close();
+			bufferedReader.close();
+			clientS.close();
+			System.out.println("Deconexion");
 		}
 	}
 
 	@Override
 	public boolean isConnected() {
-		return socket != null && socket.isConnected();
+		if (clientS != null) {
+			return clientS.isConnected() && !clientS.isClosed();
+		}
+		return false;
 	}
 
 	@Override
 	public void loadStudent(String fullname) throws IOException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		printWriter.println(RouletteV1Protocol.CMD_LOAD);
+		printWriter.flush();
+		if (!reader().equals(RouletteV1Protocol.RESPONSE_LOAD_START)) {
+			throw new IOException("failed...");
+		}
+		printWriter.println(fullname);
+		printWriter.println(RouletteV1Protocol.CMD_LOAD_ENDOFDATA_MARKER);
+		printWriter.flush();
+		reader();
 	}
 
 	@Override
 	public void loadStudents(List<Student> students) throws IOException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		printWriter.println(RouletteV1Protocol.CMD_LOAD);
+		printWriter.flush();
+		if (!reader().equals(RouletteV1Protocol.RESPONSE_LOAD_START)) {
+			throw new IOException("failed...");
+		}
+		for (Student student : students) {
+			printWriter.println(student.getFullname());
+		}
+		printWriter.println(RouletteV1Protocol.CMD_LOAD_ENDOFDATA_MARKER);
+		printWriter.flush();
+		reader();
 	}
 
 	@Override
 	public Student pickRandomStudent() throws EmptyStoreException, IOException {
-		if (this.getNumberOfStudents() == 0) {
+		printWriter.println(RouletteV1Protocol.CMD_RANDOM);
+		printWriter.flush();
+		RandomCommandResponse rcr = JsonObjectMapper.parseJson(reader(), RandomCommandResponse.class);
+		if (rcr.getError() != null) {
 			throw new EmptyStoreException();
 		}
-		return null;
+		return new Student(rcr.getFullname());
 	}
 
 	@Override
 	public int getNumberOfStudents() throws IOException {
-		String reply;
-		InfoCommandResponse infoReply;
-
-		writer.println(RouletteV1Protocol.CMD_INFO);
-		reply = reader.readLine();
-		if (reply.split(" ", 1)[0].equals("Hello")) {
-			reply = reader.readLine();
-		}
-		infoReply = JsonObjectMapper.parseJson(reply, InfoCommandResponse.class);
-		return infoReply.getNumberOfStudents();
+		printWriter.println(RouletteV1Protocol.CMD_INFO);
+		printWriter.flush();
+		InfoCommandResponse icr = JsonObjectMapper.parseJson(reader(), InfoCommandResponse.class);
+		return icr.getNumberOfStudents();
 	}
 
 	@Override
 	public String getProtocolVersion() throws IOException {
-		return RouletteV1Protocol.VERSION;
+		printWriter.println(RouletteV1Protocol.CMD_INFO);
+		printWriter.flush();
+		InfoCommandResponse icr = JsonObjectMapper.parseJson(reader(), InfoCommandResponse.class);
+		return icr.getProtocolVersion();
 	}
 
 }
